@@ -1,0 +1,22 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type GenshinCharater {
+  actived_constellation_num: Int!
+  element: String!
+  level: Int!
+  name: String!
+  rarity: Int!
+  weapon: GenshinWeapon!
+}
+
+type GenshinWeapon {
+  level: Int!
+  name: String!
+  rarity: Int!
+}
+
+type Query {
+  genshinCharaters(uid: String!, cookies: String!): [GenshinCharater!]!
+}

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gql-go/graph/model"
 	"io"
 	"math/rand"
 	"net/http"
@@ -41,23 +42,9 @@ type GenshinCharaterResponse struct {
 }
 
 type GenshinData struct {
-	Avatars []GenshinCharacter `json:"avatars"`	
+	Avatars []model.GenshinCharater `json:"avatars"`	
 }
 
-type GenshinCharacter struct {
-	Element string `json:"element"`
-	Actived_constellation_num int `json:"actived_constellation_num"`
-	Name string `json:"name"`
-	Level int `json:"level"`
-	Rarity int `json:"rarity"`
-	Weapon GenshinWeapon
-}
-
-type GenshinWeapon struct{
-	Name string `json:"name"`
-	Rarity int `json:"rarity"`
-	Level int `json:"level"`
-}
 
 func (gc *GenshinClient) generateDS() string{
 	t :=  strconv.Itoa(int(time.Now().Unix()))
