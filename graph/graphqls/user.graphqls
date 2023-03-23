@@ -1,0 +1,28 @@
+type User {
+  id: Int!
+  username: String!
+  email: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Session {
+  id: Int!
+  token: String!
+  userId: Int!
+  createdAt: Time!
+  updatedAt: Time!
+  expiresAt: Time!
+  deletedAt: Time!
+  user: User!
+}
+
+extend type Query {
+  session: Session!
+}
+
+extend type Mutation {
+  login(email: String!, password: String!): Session!
+  logout: Boolean!
+  register(email: String!, password: String!, username: String!): User!
+}

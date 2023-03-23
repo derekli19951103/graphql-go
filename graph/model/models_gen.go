@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"time"
+)
+
 type GenshinCharater struct {
 	ActivedConstellationNum int            `json:"actived_constellation_num"`
 	Element                 string         `json:"element"`
@@ -15,4 +19,23 @@ type GenshinWeapon struct {
 	Level  int    `json:"level"`
 	Name   string `json:"name"`
 	Rarity int    `json:"rarity"`
+}
+
+type Session struct {
+	ID        int       `json:"id"`
+	Token     string    `json:"token"`
+	UserID    int       `json:"userId"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	ExpiresAt time.Time `json:"expiresAt"`
+	DeletedAt time.Time `json:"deletedAt"`
+	User      *User     `json:"user"`
+}
+
+type User struct {
+	ID        int       `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }

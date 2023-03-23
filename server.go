@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"gql-go/db/model"
 	graph "gql-go/graph/resolvers"
 	"log"
@@ -15,7 +17,30 @@ import (
 )
 
 const defaultPort = "8080"
+type CKey string
 
+func GinContextToContextMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx := context.WithValue(c.Request.Context(), CKey("Gin"), c)
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	}
+}
+
+func GinContextFromContext(ctx context.Context) (*gin.Context, error) {
+	ginContext := ctx.Value("GinContextKey")
+	if ginContext == nil {
+		err := fmt.Errorf("could not retrieve gin.Context")
+		return nil, err
+	}
+
+	gc, ok := ginContext.(*gin.Context)
+	if !ok {
+		err := fmt.Errorf("gin.Context has wrong type")
+		return nil, err
+	}
+	return gc, nil
+}
 
 // Defining the Graphql handler
 func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
@@ -44,6 +69,8 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+
+	router.Use(GinContextToContextMiddleware())
 
 	dsn := "host=192.168.2.117 user=postgres password=derekli dbname=test port=5433 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
