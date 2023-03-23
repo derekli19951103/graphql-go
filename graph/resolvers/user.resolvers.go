@@ -6,28 +6,139 @@ package resolver
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
 	"fmt"
+	DBModel "gql-go/db/model"
 	"gql-go/graph/model"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.Session, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
+func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.Session, error) {
+	var user DBModel.User
+	result := r.DB.Where("email = ?", input.Email).First(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
+	if err != nil {
+		return nil, errors.New("invalid password")
+	}
+
+	expireDate := time.Now().AddDate(0, 0, 7)
+
+	tokenUser := fmt.Sprintf("%d,%s", user.ID, expireDate)
+	salt := make([]byte, 16)
+	_, err = rand.Read(salt)
+	if err != nil {
+		panic(err)
+	}
+	saltedData := append(salt, []byte(tokenUser)...)
+	encodedString := base64.StdEncoding.EncodeToString(saltedData)
+
+	session := DBModel.Session{
+		UserID:    user.ID,
+		ExpiresAt: expireDate,
+		Token:     encodedString,
+	}
+
+	result = r.DB.Create(&session)
+
+	return &model.Session{
+		ID:        session.ID,
+		UserID:    session.UserID,
+		CreatedAt: session.CreatedAt,
+		ExpiresAt: session.ExpiresAt,
+		Token:     session.Token,
+	}, result.Error
 }
 
 // Logout is the resolver for the logout field.
 func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
-	panic(fmt.Errorf("not implemented: Logout - logout"))
+	gc, err := GinContextFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	auth := gc.Request.Header["Authorization"]
+	if len(auth) == 0 {
+		return false, errors.New("no auth header")
+	}
+	
+	var session model.Session
+	result := r.DB.Where("token = ?", auth[0]).First(&session)
+	if result.Error != nil {
+		return false, errors.New("session not found")
+	}
+
+	result = r.DB.Delete(&session)
+
+	return result.Error == nil, result.Error
 }
 
 // Register is the resolver for the register field.
-func (r *mutationResolver) Register(ctx context.Context, email string, password string, username string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Register - register"))
+func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.User, error) {
+	hashedString, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+
+	user := DBModel.User{
+		Email:    input.Email,
+		Password: string(hashedString),
+		Username: input.Username,
+	}
+
+	result := r.DB.Create(&user)
+
+	return &model.User{
+		ID:        user.ID,
+		Email:     user.Email,
+		Username:  user.Username,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}, result.Error
 }
 
 // Session is the resolver for the session field.
-func (r *queryResolver) Session(ctx context.Context) (*model.Session, error) {
-	panic(fmt.Errorf("not implemented: Session - session"))
+func (r *queryResolver) Session(ctx context.Context) (*model.User, error) {
+	gc, err := GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	auth := gc.Request.Header["Authorization"]
+	if len(auth) == 0 {
+		return nil, errors.New("no auth header")
+	}
+
+	var session model.Session
+	result := r.DB.Where("token = ?", auth[0]).First(&session)
+	if result.Error != nil {
+		return nil, errors.New("session not found")
+	}
+	if session.ExpiresAt.Before(time.Now()) {
+		return nil, errors.New("session expired")
+	}
+
+	var user DBModel.User
+	result = r.DB.First(&user, session.UserID)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &model.User{
+		ID:        user.ID,
+		Email:     user.Email,
+		Username:  user.Username,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.

@@ -21,6 +21,17 @@ type GenshinWeapon struct {
 	Rarity int    `json:"rarity"`
 }
 
+type LoginInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type RegisterInput struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type Session struct {
 	ID        int       `json:"id"`
 	Token     string    `json:"token"`
