@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type CreateSketchInput struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
 type GenshinCharater struct {
 	ActivedConstellationNum int            `json:"actived_constellation_num"`
 	Element                 string         `json:"element"`
@@ -41,6 +46,21 @@ type Session struct {
 	ExpiresAt time.Time `json:"expiresAt"`
 	DeletedAt time.Time `json:"deletedAt"`
 	User      *User     `json:"user"`
+}
+
+type Sketch struct {
+	ID        int       `json:"id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	UserID    int       `json:"userID"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type UpdateSketchInput struct {
+	ID      int    `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }
 
 type User struct {

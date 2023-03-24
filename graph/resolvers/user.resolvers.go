@@ -6,8 +6,6 @@ package resolver
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	DBModel "gql-go/db/model"
@@ -34,13 +32,10 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	expireDate := time.Now().AddDate(0, 0, 7)
 
 	tokenUser := fmt.Sprintf("%d,%s", user.ID, expireDate)
-	salt := make([]byte, 16)
-	_, err = rand.Read(salt)
+	encodedString, err := EncodeToken(tokenUser)
 	if err != nil {
 		panic(err)
 	}
-	saltedData := append(salt, []byte(tokenUser)...)
-	encodedString := base64.StdEncoding.EncodeToString(saltedData)
 
 	session := DBModel.Session{
 		UserID:    user.ID,
@@ -69,7 +64,7 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 	if len(auth) == 0 {
 		return false, errors.New("no auth header")
 	}
-	
+
 	var session model.Session
 	result := r.DB.Where("token = ?", auth[0]).First(&session)
 	if result.Error != nil {
@@ -140,8 +135,3 @@ func (r *queryResolver) Session(ctx context.Context) (*model.User, error) {
 		UpdatedAt: user.UpdatedAt,
 	}, nil
 }
-
-// Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
-
-type mutationResolver struct{ *Resolver }

@@ -1,0 +1,29 @@
+type Sketch {
+  id: Int!
+  title: String!
+  content: String!
+  userID: Int!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+input CreateSketchInput {
+  title: String!
+  content: String!
+}
+
+input UpdateSketchInput {
+  id: Int!
+  title: String!
+  content: String!
+}
+
+extend type Query {
+  sketches: [Sketch]!
+}
+
+extend type Mutation {
+  createSketch(input: CreateSketchInput!): Sketch!
+  updateSketch(input: UpdateSketchInput): Sketch!
+  deleteSketch(id: Int!): Boolean!
+}
