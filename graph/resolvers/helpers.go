@@ -57,7 +57,7 @@ func DecodeToken(token string) (TokenUser, error) {
 	 // Decode the encoded string using base64
 	 decodedBytes, err := base64.StdEncoding.DecodeString(token)
 	 if err != nil {
-		 panic(err)
+		 return TokenUser{}, err
 	 }
  
 	 // Separate the salt value from the decoded bytes

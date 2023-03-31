@@ -39,7 +39,7 @@ func (r *mutationResolver) CreateSketch(ctx context.Context, input model.CreateS
 func (r *mutationResolver) UpdateSketch(ctx context.Context, input *model.UpdateSketchInput) (*model.Sketch, error) {
 	tokenUser, err := GetTokenUser(ctx)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	var sketch DBModel.Sketch
@@ -68,7 +68,7 @@ func (r *mutationResolver) UpdateSketch(ctx context.Context, input *model.Update
 func (r *mutationResolver) DeleteSketch(ctx context.Context, id int) (bool, error) {
 	tokenUser, err := GetTokenUser(ctx)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
 	var sketch DBModel.Sketch
@@ -86,7 +86,7 @@ func (r *mutationResolver) DeleteSketch(ctx context.Context, id int) (bool, erro
 func (r *queryResolver) Sketches(ctx context.Context) ([]*model.Sketch, error) {
 	tokenUser, err := GetTokenUser(ctx)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	var sketches []*DBModel.Sketch

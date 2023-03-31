@@ -22,10 +22,11 @@ func (r *queryResolver) GenshinCharaters(ctx context.Context, uid string, cookie
 	if err != nil {
 		return make([]*model.GenshinCharater, 0), errors.New("can't get data")
 	}
+
 	var charaters []*model.GenshinCharater
 
-	for _, charater := range resp.Data.Avatars {
-		charaters = append(charaters, &charater)
+	for i := range resp.Data.Avatars {
+		charaters = append(charaters, &resp.Data.Avatars[i])
 	}
 	return charaters, nil
 }
