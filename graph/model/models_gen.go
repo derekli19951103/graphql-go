@@ -6,6 +6,14 @@ import (
 	"time"
 )
 
+type CreateGeoObjectInput struct {
+	Type       string                 `json:"type"`
+	Title      string                 `json:"title"`
+	Content    *string                `json:"content,omitempty"`
+	ImageURL   *string                `json:"imageUrl,omitempty"`
+	Properties map[string]interface{} `json:"properties,omitempty"`
+}
+
 type CreateSketchInput struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
@@ -26,6 +34,17 @@ type GenshinWeapon struct {
 	Rarity int    `json:"rarity"`
 }
 
+type GeoObject struct {
+	ID         int                    `json:"id"`
+	Type       string                 `json:"type"`
+	Title      string                 `json:"title"`
+	Content    *string                `json:"content,omitempty"`
+	ImageURL   *string                `json:"imageUrl,omitempty"`
+	Properties map[string]interface{} `json:"properties,omitempty"`
+	CreatedAt  time.Time              `json:"createdAt"`
+	UpdatedAt  time.Time              `json:"updatedAt"`
+}
+
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -42,10 +61,7 @@ type Session struct {
 	Token     string    `json:"token"`
 	UserID    int       `json:"userId"`
 	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
 	ExpiresAt time.Time `json:"expiresAt"`
-	DeletedAt time.Time `json:"deletedAt"`
-	User      *User     `json:"user"`
 }
 
 type Sketch struct {
@@ -55,6 +71,15 @@ type Sketch struct {
 	UserID    int       `json:"userID"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type UpdateGeoObjectInput struct {
+	ID         int                    `json:"id"`
+	Type       string                 `json:"type"`
+	Title      string                 `json:"title"`
+	Content    *string                `json:"content,omitempty"`
+	ImageURL   *string                `json:"imageUrl,omitempty"`
+	Properties map[string]interface{} `json:"properties,omitempty"`
 }
 
 type UpdateSketchInput struct {

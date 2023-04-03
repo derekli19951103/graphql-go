@@ -22,8 +22,6 @@ type Session struct {
 	gorm.Model
 	ID        int `gorm:"primaryKey"`
 	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
 	UserID    int
 	User	  User
 	Token     string `gorm:"unique;not null"`

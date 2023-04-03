@@ -52,7 +52,7 @@ func main() {
 	if err != nil {
         panic(err)
     }
-	err = db.AutoMigrate(&model.User{}, &model.Sketch{},&model.Session{})
+	err = db.AutoMigrate(&model.User{}, &model.Sketch{},&model.Session{}, &model.GeoObject{})
 	if err != nil {
 		log.Fatal(err)
 	}

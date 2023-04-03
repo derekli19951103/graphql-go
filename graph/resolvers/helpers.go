@@ -4,12 +4,14 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/datatypes"
 )
 
 type CKey string
@@ -95,4 +97,21 @@ func GetTokenUser(ctx context.Context) (TokenUser, error) {
 	}
 
 	return DecodeToken(auth[0])
+}
+
+func mapToJSON(m map[string]interface{}) (datatypes.JSON, error) {
+    jsonBytes, err := json.Marshal(m)
+    if err != nil {
+        return datatypes.JSON{}, err
+    }
+    return datatypes.JSON(jsonBytes), nil
+}
+
+func jsonToMap(j datatypes.JSON) (map[string]interface{}, error) {
+    var m map[string]interface{}
+    err := json.Unmarshal(j, &m)
+    if err != nil {
+        return nil, err
+    }
+    return m, nil
 }

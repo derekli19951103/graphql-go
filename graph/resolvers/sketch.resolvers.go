@@ -106,8 +106,3 @@ func (r *queryResolver) Sketches(ctx context.Context) ([]*model.Sketch, error) {
 
 	return sketchModels, result.Error
 }
-
-// Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
-
-type mutationResolver struct{ *Resolver }

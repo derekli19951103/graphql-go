@@ -1,0 +1,37 @@
+type GeoObject {
+  id: Int!
+  type: String!
+  title: String!
+  content: String
+  imageUrl: String
+  properties: JSON
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+input CreateGeoObjectInput {
+  type: String!
+  title: String!
+  content: String
+  imageUrl: String
+  properties: JSON
+}
+
+input UpdateGeoObjectInput {
+  id: Int!
+  type: String!
+  title: String!
+  content: String
+  imageUrl: String
+  properties: JSON
+}
+
+extend type Query {
+  geoObjects(userId: Int!): [GeoObject]
+}
+
+extend type Mutation {
+  createGeoObject(input: CreateGeoObjectInput): GeoObject
+  updateGeoObject(input: UpdateGeoObjectInput): GeoObject
+  deleteGeoObject(id: Int!): GeoObject
+}
