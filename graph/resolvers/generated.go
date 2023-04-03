@@ -595,7 +595,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../graphqls/genshin.graphqls", Input: `type GenshinCharater {
+	{Name: "../graphqls/genshin.graphql", Input: `type GenshinCharater {
   actived_constellation_num: Int!
   element: String!
   level: Int!
@@ -614,7 +614,7 @@ extend type Query {
   genshinCharaters(uid: String!, cookies: String!): [GenshinCharater!]!
 }
 `, BuiltIn: false},
-	{Name: "../graphqls/geoObject.graphqls", Input: `type GeoObject {
+	{Name: "../graphqls/geoObject.graphql", Input: `type GeoObject {
   id: Int!
   type: String!
   title: String!
@@ -652,10 +652,10 @@ extend type Mutation {
   deleteGeoObject(id: Int!): GeoObject
 }
 `, BuiltIn: false},
-	{Name: "../graphqls/scalar.graphqls", Input: `scalar Time
+	{Name: "../graphqls/scalar.graphql", Input: `scalar Time
 scalar JSON
 `, BuiltIn: false},
-	{Name: "../graphqls/sketch.graphqls", Input: `type Sketch {
+	{Name: "../graphqls/sketch.graphql", Input: `type Sketch {
   id: Int!
   title: String!
   content: String!
@@ -685,7 +685,7 @@ extend type Mutation {
   deleteSketch(id: Int!): Boolean!
 }
 `, BuiltIn: false},
-	{Name: "../graphqls/user.graphqls", Input: `type User {
+	{Name: "../graphqls/user.graphql", Input: `type User {
   id: Int!
   username: String!
   email: String!
