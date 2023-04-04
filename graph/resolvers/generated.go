@@ -72,14 +72,14 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateGeoObject func(childComplexity int, input *model.CreateGeoObjectInput) int
+		CreateGeoObject func(childComplexity int, input model.CreateGeoObjectInput) int
 		CreateSketch    func(childComplexity int, input model.CreateSketchInput) int
 		DeleteGeoObject func(childComplexity int, id int) int
 		DeleteSketch    func(childComplexity int, id int) int
 		Login           func(childComplexity int, input model.LoginInput) int
 		Logout          func(childComplexity int) int
 		Register        func(childComplexity int, input model.RegisterInput) int
-		UpdateGeoObject func(childComplexity int, input *model.UpdateGeoObjectInput) int
+		UpdateGeoObject func(childComplexity int, input model.UpdateGeoObjectInput) int
 		UpdateSketch    func(childComplexity int, input *model.UpdateSketchInput) int
 	}
 
@@ -92,10 +92,11 @@ type ComplexityRoot struct {
 
 	Session struct {
 		CreatedAt func(childComplexity int) int
+		Email     func(childComplexity int) int
 		ExpiresAt func(childComplexity int) int
-		ID        func(childComplexity int) int
 		Token     func(childComplexity int) int
 		UserID    func(childComplexity int) int
+		Username  func(childComplexity int) int
 	}
 
 	Sketch struct {
@@ -117,8 +118,8 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateGeoObject(ctx context.Context, input *model.CreateGeoObjectInput) (*model.GeoObject, error)
-	UpdateGeoObject(ctx context.Context, input *model.UpdateGeoObjectInput) (*model.GeoObject, error)
+	CreateGeoObject(ctx context.Context, input model.CreateGeoObjectInput) (*model.GeoObject, error)
+	UpdateGeoObject(ctx context.Context, input model.UpdateGeoObjectInput) (*model.GeoObject, error)
 	DeleteGeoObject(ctx context.Context, id int) (*model.GeoObject, error)
 	CreateSketch(ctx context.Context, input model.CreateSketchInput) (*model.Sketch, error)
 	UpdateSketch(ctx context.Context, input *model.UpdateSketchInput) (*model.Sketch, error)
@@ -278,7 +279,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateGeoObject(childComplexity, args["input"].(*model.CreateGeoObjectInput)), true
+		return e.complexity.Mutation.CreateGeoObject(childComplexity, args["input"].(model.CreateGeoObjectInput)), true
 
 	case "Mutation.createSketch":
 		if e.complexity.Mutation.CreateSketch == nil {
@@ -357,7 +358,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateGeoObject(childComplexity, args["input"].(*model.UpdateGeoObjectInput)), true
+		return e.complexity.Mutation.UpdateGeoObject(childComplexity, args["input"].(model.UpdateGeoObjectInput)), true
 
 	case "Mutation.updateSketch":
 		if e.complexity.Mutation.UpdateSketch == nil {
@@ -416,19 +417,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Session.CreatedAt(childComplexity), true
 
+	case "Session.email":
+		if e.complexity.Session.Email == nil {
+			break
+		}
+
+		return e.complexity.Session.Email(childComplexity), true
+
 	case "Session.expiresAt":
 		if e.complexity.Session.ExpiresAt == nil {
 			break
 		}
 
 		return e.complexity.Session.ExpiresAt(childComplexity), true
-
-	case "Session.id":
-		if e.complexity.Session.ID == nil {
-			break
-		}
-
-		return e.complexity.Session.ID(childComplexity), true
 
 	case "Session.token":
 		if e.complexity.Session.Token == nil {
@@ -443,6 +444,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Session.UserID(childComplexity), true
+
+	case "Session.username":
+		if e.complexity.Session.Username == nil {
+			break
+		}
+
+		return e.complexity.Session.Username(childComplexity), true
 
 	case "Sketch.content":
 		if e.complexity.Sketch.Content == nil {
@@ -643,13 +651,13 @@ input UpdateGeoObjectInput {
 }
 
 extend type Query {
-  geoObjects(userId: Int!): [GeoObject]
+  geoObjects(userId: Int!): [GeoObject!]
 }
 
 extend type Mutation {
-  createGeoObject(input: CreateGeoObjectInput): GeoObject
-  updateGeoObject(input: UpdateGeoObjectInput): GeoObject
-  deleteGeoObject(id: Int!): GeoObject
+  createGeoObject(input: CreateGeoObjectInput!): GeoObject!
+  updateGeoObject(input: UpdateGeoObjectInput!): GeoObject!
+  deleteGeoObject(id: Int!): GeoObject!
 }
 `, BuiltIn: false},
 	{Name: "../graphqls/scalar.graphql", Input: `scalar Time
@@ -694,7 +702,8 @@ extend type Mutation {
 }
 
 type Session {
-  id: Int!
+  username: String!
+  email: String!
   token: String!
   userId: Int!
   createdAt: Time!
@@ -732,10 +741,10 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_createGeoObject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.CreateGeoObjectInput
+	var arg0 model.CreateGeoObjectInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOCreateGeoObjectInput2ᚖgqlᚑgoᚋgraphᚋmodelᚐCreateGeoObjectInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateGeoObjectInput2gqlᚑgoᚋgraphᚋmodelᚐCreateGeoObjectInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -822,10 +831,10 @@ func (ec *executionContext) field_Mutation_register_args(ctx context.Context, ra
 func (ec *executionContext) field_Mutation_updateGeoObject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.UpdateGeoObjectInput
+	var arg0 model.UpdateGeoObjectInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOUpdateGeoObjectInput2ᚖgqlᚑgoᚋgraphᚋmodelᚐUpdateGeoObjectInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateGeoObjectInput2gqlᚑgoᚋgraphᚋmodelᚐUpdateGeoObjectInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1702,18 +1711,21 @@ func (ec *executionContext) _Mutation_createGeoObject(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateGeoObject(rctx, fc.Args["input"].(*model.CreateGeoObjectInput))
+		return ec.resolvers.Mutation().CreateGeoObject(rctx, fc.Args["input"].(model.CreateGeoObjectInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.GeoObject)
 	fc.Result = res
-	return ec.marshalOGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, field.Selections, res)
+	return ec.marshalNGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createGeoObject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1772,18 +1784,21 @@ func (ec *executionContext) _Mutation_updateGeoObject(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateGeoObject(rctx, fc.Args["input"].(*model.UpdateGeoObjectInput))
+		return ec.resolvers.Mutation().UpdateGeoObject(rctx, fc.Args["input"].(model.UpdateGeoObjectInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.GeoObject)
 	fc.Result = res
-	return ec.marshalOGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, field.Selections, res)
+	return ec.marshalNGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateGeoObject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1849,11 +1864,14 @@ func (ec *executionContext) _Mutation_deleteGeoObject(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.GeoObject)
 	fc.Result = res
-	return ec.marshalOGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, field.Selections, res)
+	return ec.marshalNGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteGeoObject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2130,8 +2148,10 @@ func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Session_id(ctx, field)
+			case "username":
+				return ec.fieldContext_Session_username(ctx, field)
+			case "email":
+				return ec.fieldContext_Session_email(ctx, field)
 			case "token":
 				return ec.fieldContext_Session_token(ctx, field)
 			case "userId":
@@ -2363,7 +2383,7 @@ func (ec *executionContext) _Query_geoObjects(ctx context.Context, field graphql
 	}
 	res := resTmp.([]*model.GeoObject)
 	fc.Result = res
-	return ec.marshalOGeoObject2ᚕᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, field.Selections, res)
+	return ec.marshalOGeoObject2ᚕᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObjectᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_geoObjects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2651,8 +2671,8 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Session_id(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Session_id(ctx, field)
+func (ec *executionContext) _Session_username(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_username(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2665,7 +2685,7 @@ func (ec *executionContext) _Session_id(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return obj.Username, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2677,19 +2697,63 @@ func (ec *executionContext) _Session_id(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Session_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Session_username(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Session",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_email(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_email(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5622,18 +5686,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_createGeoObject(ctx, field)
 			})
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "updateGeoObject":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateGeoObject(ctx, field)
 			})
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "deleteGeoObject":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteGeoObject(ctx, field)
 			})
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createSketch":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -5840,9 +5913,16 @@ func (ec *executionContext) _Session(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Session")
-		case "id":
+		case "username":
 
-			out.Values[i] = ec._Session_id(ctx, field, obj)
+			out.Values[i] = ec._Session_username(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "email":
+
+			out.Values[i] = ec._Session_email(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -6338,6 +6418,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCreateGeoObjectInput2gqlᚑgoᚋgraphᚋmodelᚐCreateGeoObjectInput(ctx context.Context, v interface{}) (model.CreateGeoObjectInput, error) {
+	res, err := ec.unmarshalInputCreateGeoObjectInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateSketchInput2gqlᚑgoᚋgraphᚋmodelᚐCreateSketchInput(ctx context.Context, v interface{}) (model.CreateSketchInput, error) {
 	res, err := ec.unmarshalInputCreateSketchInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6405,6 +6490,20 @@ func (ec *executionContext) marshalNGenshinWeapon2ᚖgqlᚑgoᚋgraphᚋmodelᚐ
 		return graphql.Null
 	}
 	return ec._GenshinWeapon(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNGeoObject2gqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx context.Context, sel ast.SelectionSet, v model.GeoObject) graphql.Marshaler {
+	return ec._GeoObject(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx context.Context, sel ast.SelectionSet, v *model.GeoObject) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GeoObject(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -6526,6 +6625,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateGeoObjectInput2gqlᚑgoᚋgraphᚋmodelᚐUpdateGeoObjectInput(ctx context.Context, v interface{}) (model.UpdateGeoObjectInput, error) {
+	res, err := ec.unmarshalInputUpdateGeoObjectInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUser2gqlᚑgoᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
@@ -6821,15 +6925,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOCreateGeoObjectInput2ᚖgqlᚑgoᚋgraphᚋmodelᚐCreateGeoObjectInput(ctx context.Context, v interface{}) (*model.CreateGeoObjectInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputCreateGeoObjectInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOGeoObject2ᚕᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx context.Context, sel ast.SelectionSet, v []*model.GeoObject) graphql.Marshaler {
+func (ec *executionContext) marshalOGeoObject2ᚕᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.GeoObject) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6856,7 +6952,7 @@ func (ec *executionContext) marshalOGeoObject2ᚕᚖgqlᚑgoᚋgraphᚋmodelᚐG
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, sel, v[i])
+			ret[i] = ec.marshalNGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6867,14 +6963,13 @@ func (ec *executionContext) marshalOGeoObject2ᚕᚖgqlᚑgoᚋgraphᚋmodelᚐG
 	}
 	wg.Wait()
 
-	return ret
-}
-
-func (ec *executionContext) marshalOGeoObject2ᚖgqlᚑgoᚋgraphᚋmodelᚐGeoObject(ctx context.Context, sel ast.SelectionSet, v *model.GeoObject) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
 	}
-	return ec._GeoObject(ctx, sel, v)
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOJSON2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
@@ -6914,14 +7009,6 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
-}
-
-func (ec *executionContext) unmarshalOUpdateGeoObjectInput2ᚖgqlᚑgoᚋgraphᚋmodelᚐUpdateGeoObjectInput(ctx context.Context, v interface{}) (*model.UpdateGeoObjectInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputUpdateGeoObjectInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOUpdateSketchInput2ᚖgqlᚑgoᚋgraphᚋmodelᚐUpdateSketchInput(ctx context.Context, v interface{}) (*model.UpdateSketchInput, error) {

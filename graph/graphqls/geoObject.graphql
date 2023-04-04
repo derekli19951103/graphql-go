@@ -27,11 +27,11 @@ input UpdateGeoObjectInput {
 }
 
 extend type Query {
-  geoObjects(userId: Int!): [GeoObject]
+  geoObjects(userId: Int!): [GeoObject!]
 }
 
 extend type Mutation {
-  createGeoObject(input: CreateGeoObjectInput): GeoObject
-  updateGeoObject(input: UpdateGeoObjectInput): GeoObject
-  deleteGeoObject(id: Int!): GeoObject
+  createGeoObject(input: CreateGeoObjectInput!): GeoObject!
+  updateGeoObject(input: UpdateGeoObjectInput!): GeoObject!
+  deleteGeoObject(id: Int!): GeoObject!
 }

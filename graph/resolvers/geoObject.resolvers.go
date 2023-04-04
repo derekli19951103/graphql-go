@@ -11,7 +11,7 @@ import (
 )
 
 // CreateGeoObject is the resolver for the createGeoObject field.
-func (r *mutationResolver) CreateGeoObject(ctx context.Context, input *model.CreateGeoObjectInput) (*model.GeoObject, error) {
+func (r *mutationResolver) CreateGeoObject(ctx context.Context, input model.CreateGeoObjectInput) (*model.GeoObject, error) {
 	tokenUser, err := GetTokenUser(ctx)
 	if err != nil {
 		panic(err)
@@ -22,12 +22,23 @@ func (r *mutationResolver) CreateGeoObject(ctx context.Context, input *model.Cre
 		panic(err)
 	}
 
+	var content string
+	var imageURL string
+
+	if input.Content != nil {
+		content = *input.Content
+	}
+
+	if input.ImageURL != nil {
+		imageURL = *input.ImageURL
+	}
+
 	geoObject := DBModel.GeoObject{
 		UserID:     tokenUser.ID,
 		Type:       input.Type,
 		Title:      input.Title,
-		Content:    *input.Content,
-		ImageUrl:   *input.ImageURL,
+		Content:    content,
+		ImageUrl:   imageURL,
 		Properties: jsonProperties,
 	}
 
@@ -46,7 +57,7 @@ func (r *mutationResolver) CreateGeoObject(ctx context.Context, input *model.Cre
 }
 
 // UpdateGeoObject is the resolver for the updateGeoObject field.
-func (r *mutationResolver) UpdateGeoObject(ctx context.Context, input *model.UpdateGeoObjectInput) (*model.GeoObject, error) {
+func (r *mutationResolver) UpdateGeoObject(ctx context.Context, input model.UpdateGeoObjectInput) (*model.GeoObject, error) {
 	tokenUser, err := GetTokenUser(ctx)
 	if err != nil {
 		return nil, err
@@ -64,10 +75,16 @@ func (r *mutationResolver) UpdateGeoObject(ctx context.Context, input *model.Upd
 		panic(err)
 	}
 
+	if input.Content != nil {
+		geoObject.Content = *input.Content
+	}
+
+	if input.ImageURL != nil {
+		geoObject.ImageUrl = *input.ImageURL
+	}
+
 	geoObject.Type = input.Type
 	geoObject.Title = input.Title
-	geoObject.Content = *input.Content
-	geoObject.ImageUrl = *input.ImageURL
 	geoObject.Properties = jsonProperties
 
 	result = r.DB.Save(&geoObject)

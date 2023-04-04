@@ -57,7 +57,8 @@ type RegisterInput struct {
 }
 
 type Session struct {
-	ID        int       `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
 	Token     string    `json:"token"`
 	UserID    int       `json:"userId"`
 	CreatedAt time.Time `json:"createdAt"`

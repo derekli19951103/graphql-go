@@ -21,12 +21,12 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	result := r.DB.Where("email = ?", input.Email).First(&user)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, errors.New("email and password do not match")
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
 	if err != nil {
-		return nil, errors.New("invalid password")
+		return nil, errors.New("email and password do not match")
 	}
 
 	expireDate := time.Now().AddDate(0, 0, 7)
@@ -46,7 +46,8 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	result = r.DB.Create(&session)
 
 	return &model.Session{
-		ID:        session.ID,
+		Username:  user.Username,
+		Email:     user.Email,
 		UserID:    session.UserID,
 		CreatedAt: session.CreatedAt,
 		ExpiresAt: session.ExpiresAt,
@@ -111,7 +112,7 @@ func (r *queryResolver) Session(ctx context.Context) (*model.User, error) {
 		return nil, errors.New("no auth header")
 	}
 
-	var session model.Session
+	var session DBModel.Session
 	result := r.DB.Where("token = ?", auth[0]).First(&session)
 	if result.Error != nil {
 		return nil, errors.New("session not found")
