@@ -21,4 +21,6 @@ type GeoObject struct {
 	Properties  datatypes.JSON 
 	User      User
 	UserID    int
+	Lng 	  float64
+	Lat 	  float64
 }

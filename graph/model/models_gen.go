@@ -12,6 +12,8 @@ type CreateGeoObjectInput struct {
 	Content    *string                `json:"content,omitempty"`
 	ImageURL   *string                `json:"imageUrl,omitempty"`
 	Properties map[string]interface{} `json:"properties,omitempty"`
+	Lat        float64                `json:"lat"`
+	Lng        float64                `json:"lng"`
 }
 
 type CreateSketchInput struct {
@@ -41,6 +43,8 @@ type GeoObject struct {
 	Content    *string                `json:"content,omitempty"`
 	ImageURL   *string                `json:"imageUrl,omitempty"`
 	Properties map[string]interface{} `json:"properties,omitempty"`
+	Lat        float64                `json:"lat"`
+	Lng        float64                `json:"lng"`
 	CreatedAt  time.Time              `json:"createdAt"`
 	UpdatedAt  time.Time              `json:"updatedAt"`
 }
@@ -81,6 +85,8 @@ type UpdateGeoObjectInput struct {
 	Content    *string                `json:"content,omitempty"`
 	ImageURL   *string                `json:"imageUrl,omitempty"`
 	Properties map[string]interface{} `json:"properties,omitempty"`
+	Lat        float64                `json:"lat"`
+	Lng        float64                `json:"lng"`
 }
 
 type UpdateSketchInput struct {

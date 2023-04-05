@@ -65,6 +65,8 @@ type ComplexityRoot struct {
 		CreatedAt  func(childComplexity int) int
 		ID         func(childComplexity int) int
 		ImageURL   func(childComplexity int) int
+		Lat        func(childComplexity int) int
+		Lng        func(childComplexity int) int
 		Properties func(childComplexity int) int
 		Title      func(childComplexity int) int
 		Type       func(childComplexity int) int
@@ -240,6 +242,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.GeoObject.ImageURL(childComplexity), true
+
+	case "GeoObject.lat":
+		if e.complexity.GeoObject.Lat == nil {
+			break
+		}
+
+		return e.complexity.GeoObject.Lat(childComplexity), true
+
+	case "GeoObject.lng":
+		if e.complexity.GeoObject.Lng == nil {
+			break
+		}
+
+		return e.complexity.GeoObject.Lng(childComplexity), true
 
 	case "GeoObject.properties":
 		if e.complexity.GeoObject.Properties == nil {
@@ -629,6 +645,8 @@ extend type Query {
   content: String
   imageUrl: String
   properties: JSON
+  lat: Float!
+  lng: Float!
   createdAt: Time!
   updatedAt: Time!
 }
@@ -639,6 +657,8 @@ input CreateGeoObjectInput {
   content: String
   imageUrl: String
   properties: JSON
+  lat: Float!
+  lng: Float!
 }
 
 input UpdateGeoObjectInput {
@@ -648,6 +668,8 @@ input UpdateGeoObjectInput {
   content: String
   imageUrl: String
   properties: JSON
+  lat: Float!
+  lng: Float!
 }
 
 extend type Query {
@@ -1609,6 +1631,94 @@ func (ec *executionContext) fieldContext_GeoObject_properties(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _GeoObject_lat(ctx context.Context, field graphql.CollectedField, obj *model.GeoObject) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GeoObject_lat(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lat, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GeoObject_lat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GeoObject",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GeoObject_lng(ctx context.Context, field graphql.CollectedField, obj *model.GeoObject) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GeoObject_lng(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lng, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GeoObject_lng(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GeoObject",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _GeoObject_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.GeoObject) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_GeoObject_createdAt(ctx, field)
 	if err != nil {
@@ -1748,6 +1858,10 @@ func (ec *executionContext) fieldContext_Mutation_createGeoObject(ctx context.Co
 				return ec.fieldContext_GeoObject_imageUrl(ctx, field)
 			case "properties":
 				return ec.fieldContext_GeoObject_properties(ctx, field)
+			case "lat":
+				return ec.fieldContext_GeoObject_lat(ctx, field)
+			case "lng":
+				return ec.fieldContext_GeoObject_lng(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_GeoObject_createdAt(ctx, field)
 			case "updatedAt":
@@ -1821,6 +1935,10 @@ func (ec *executionContext) fieldContext_Mutation_updateGeoObject(ctx context.Co
 				return ec.fieldContext_GeoObject_imageUrl(ctx, field)
 			case "properties":
 				return ec.fieldContext_GeoObject_properties(ctx, field)
+			case "lat":
+				return ec.fieldContext_GeoObject_lat(ctx, field)
+			case "lng":
+				return ec.fieldContext_GeoObject_lng(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_GeoObject_createdAt(ctx, field)
 			case "updatedAt":
@@ -1894,6 +2012,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteGeoObject(ctx context.Co
 				return ec.fieldContext_GeoObject_imageUrl(ctx, field)
 			case "properties":
 				return ec.fieldContext_GeoObject_properties(ctx, field)
+			case "lat":
+				return ec.fieldContext_GeoObject_lat(ctx, field)
+			case "lng":
+				return ec.fieldContext_GeoObject_lng(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_GeoObject_createdAt(ctx, field)
 			case "updatedAt":
@@ -2406,6 +2528,10 @@ func (ec *executionContext) fieldContext_Query_geoObjects(ctx context.Context, f
 				return ec.fieldContext_GeoObject_imageUrl(ctx, field)
 			case "properties":
 				return ec.fieldContext_GeoObject_properties(ctx, field)
+			case "lat":
+				return ec.fieldContext_GeoObject_lat(ctx, field)
+			case "lng":
+				return ec.fieldContext_GeoObject_lng(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_GeoObject_createdAt(ctx, field)
 			case "updatedAt":
@@ -5199,7 +5325,7 @@ func (ec *executionContext) unmarshalInputCreateGeoObjectInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "title", "content", "imageUrl", "properties"}
+	fieldsInOrder := [...]string{"type", "title", "content", "imageUrl", "properties", "lat", "lng"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5243,6 +5369,22 @@ func (ec *executionContext) unmarshalInputCreateGeoObjectInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("properties"))
 			it.Properties, err = ec.unmarshalOJSON2map(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lat":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lat"))
+			it.Lat, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lng":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lng"))
+			it.Lng, err = ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5375,7 +5517,7 @@ func (ec *executionContext) unmarshalInputUpdateGeoObjectInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "type", "title", "content", "imageUrl", "properties"}
+	fieldsInOrder := [...]string{"id", "type", "title", "content", "imageUrl", "properties", "lat", "lng"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5427,6 +5569,22 @@ func (ec *executionContext) unmarshalInputUpdateGeoObjectInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("properties"))
 			it.Properties, err = ec.unmarshalOJSON2map(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lat":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lat"))
+			it.Lat, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lng":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lng"))
+			it.Lng, err = ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5636,6 +5794,20 @@ func (ec *executionContext) _GeoObject(ctx context.Context, sel ast.SelectionSet
 
 			out.Values[i] = ec._GeoObject_properties(ctx, field, obj)
 
+		case "lat":
+
+			out.Values[i] = ec._GeoObject_lat(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lng":
+
+			out.Values[i] = ec._GeoObject_lng(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdAt":
 
 			out.Values[i] = ec._GeoObject_createdAt(ctx, field, obj)
@@ -6426,6 +6598,21 @@ func (ec *executionContext) unmarshalNCreateGeoObjectInput2gqlᚑgoᚋgraphᚋmo
 func (ec *executionContext) unmarshalNCreateSketchInput2gqlᚑgoᚋgraphᚋmodelᚐCreateSketchInput(ctx context.Context, v interface{}) (model.CreateSketchInput, error) {
 	res, err := ec.unmarshalInputCreateSketchInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloatContext(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) marshalNGenshinCharater2ᚕᚖgqlᚑgoᚋgraphᚋmodelᚐGenshinCharaterᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.GenshinCharater) graphql.Marshaler {

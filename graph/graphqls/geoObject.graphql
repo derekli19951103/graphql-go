@@ -5,6 +5,8 @@ type GeoObject {
   content: String
   imageUrl: String
   properties: JSON
+  lat: Float!
+  lng: Float!
   createdAt: Time!
   updatedAt: Time!
 }
@@ -15,6 +17,8 @@ input CreateGeoObjectInput {
   content: String
   imageUrl: String
   properties: JSON
+  lat: Float!
+  lng: Float!
 }
 
 input UpdateGeoObjectInput {
@@ -24,6 +28,8 @@ input UpdateGeoObjectInput {
   content: String
   imageUrl: String
   properties: JSON
+  lat: Float!
+  lng: Float!
 }
 
 extend type Query {

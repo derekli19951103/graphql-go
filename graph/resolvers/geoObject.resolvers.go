@@ -40,6 +40,8 @@ func (r *mutationResolver) CreateGeoObject(ctx context.Context, input model.Crea
 		Content:    content,
 		ImageUrl:   imageURL,
 		Properties: jsonProperties,
+		Lng:        input.Lng,
+		Lat:        input.Lat,
 	}
 
 	result := r.DB.Create(&geoObject)
@@ -53,6 +55,8 @@ func (r *mutationResolver) CreateGeoObject(ctx context.Context, input model.Crea
 		Properties: input.Properties,
 		CreatedAt:  geoObject.CreatedAt,
 		UpdatedAt:  geoObject.UpdatedAt,
+		Lng:        geoObject.Lng,
+		Lat:        geoObject.Lat,
 	}, result.Error
 }
 
@@ -86,6 +90,8 @@ func (r *mutationResolver) UpdateGeoObject(ctx context.Context, input model.Upda
 	geoObject.Type = input.Type
 	geoObject.Title = input.Title
 	geoObject.Properties = jsonProperties
+	geoObject.Lng = input.Lng
+	geoObject.Lat = input.Lat
 
 	result = r.DB.Save(&geoObject)
 
@@ -98,6 +104,8 @@ func (r *mutationResolver) UpdateGeoObject(ctx context.Context, input model.Upda
 		Properties: input.Properties,
 		CreatedAt:  geoObject.CreatedAt,
 		UpdatedAt:  geoObject.UpdatedAt,
+		Lng:        geoObject.Lng,
+		Lat:        geoObject.Lat,
 	}, result.Error
 }
 
@@ -129,6 +137,8 @@ func (r *mutationResolver) DeleteGeoObject(ctx context.Context, id int) (*model.
 		Content:    &geoObject.Content,
 		ImageURL:   &geoObject.ImageUrl,
 		Properties: mapProperties,
+		Lng:        geoObject.Lng,
+		Lat:        geoObject.Lat,
 	}, result.Error
 }
 
@@ -149,15 +159,20 @@ func (r *queryResolver) GeoObjects(ctx context.Context, userID int) ([]*model.Ge
 			panic(err)
 		}
 
+		var imageURL string = geoObject.ImageUrl
+		var content string = geoObject.Content
+
 		geoObjectModels = append(geoObjectModels, &model.GeoObject{
 			ID:         geoObject.ID,
 			Type:       geoObject.Type,
 			Title:      geoObject.Title,
-			Content:    &geoObject.Content,
-			ImageURL:   &geoObject.ImageUrl,
+			Content:    &content,
+			ImageURL:   &imageURL,
 			Properties: mapProperties,
 			CreatedAt:  geoObject.CreatedAt,
 			UpdatedAt:  geoObject.UpdatedAt,
+			Lng:        geoObject.Lng,
+			Lat:        geoObject.Lat,
 		})
 	}
 
