@@ -1,0 +1,25 @@
+enum FileType {
+  JSON
+  IMAGE
+  OTHER
+}
+
+type Upload {
+  id: Int!
+  type: FileType!
+  url: String!
+}
+
+input CreateUploadInput {
+  type: FileType!
+  url: String!
+}
+
+extend type Query {
+  getUploads(userId: Int!, fileType: FileType): [Upload!]
+}
+
+extend type Mutation {
+  createUpload(input: CreateUploadInput!): Upload!
+  deleteUpload(id: Int!): Upload!
+}

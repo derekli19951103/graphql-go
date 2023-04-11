@@ -66,7 +66,7 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 		return false, errors.New("no auth header")
 	}
 
-	var session model.Session
+	var session DBModel.Session
 	result := r.DB.Where("token = ?", auth[0]).First(&session)
 	if result.Error != nil {
 		return false, errors.New("session not found")

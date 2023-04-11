@@ -3,6 +3,9 @@
 package model
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 )
 
@@ -19,6 +22,11 @@ type CreateGeoObjectInput struct {
 type CreateSketchInput struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
+}
+
+type CreateUploadInput struct {
+	Type FileType `json:"type"`
+	URL  string   `json:"url"`
 }
 
 type GenshinCharater struct {
@@ -95,10 +103,59 @@ type UpdateSketchInput struct {
 	Content string `json:"content"`
 }
 
+type Upload struct {
+	ID   int      `json:"id"`
+	Type FileType `json:"type"`
+	URL  string   `json:"url"`
+}
+
 type User struct {
 	ID        int       `json:"id"`
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type FileType string
+
+const (
+	FileTypeJSON  FileType = "JSON"
+	FileTypeImage FileType = "IMAGE"
+	FileTypeOther FileType = "OTHER"
+)
+
+var AllFileType = []FileType{
+	FileTypeJSON,
+	FileTypeImage,
+	FileTypeOther,
+}
+
+func (e FileType) IsValid() bool {
+	switch e {
+	case FileTypeJSON, FileTypeImage, FileTypeOther:
+		return true
+	}
+	return false
+}
+
+func (e FileType) String() string {
+	return string(e)
+}
+
+func (e *FileType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = FileType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid FileType", str)
+	}
+	return nil
+}
+
+func (e FileType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
