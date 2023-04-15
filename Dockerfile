@@ -10,8 +10,5 @@ COPY . /app
 # Build the server executable
 RUN go build -o server server.go
 
-# Expose port 8080 for the server
-EXPOSE 8080
-
 # Run the server when the container starts
 CMD ["./server"]
